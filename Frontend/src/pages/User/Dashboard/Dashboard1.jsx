@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Dashboard.css';
 import FRSLineChart from '../../../components/Graph/FRSLineChart';
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded'; // Importing the icon
 import SortIcon from '@mui/icons-material/Sort';
-import frsTotalImage from '../../../assets/images/frsTotal.avif';
-import frsGainedImage from '../../../assets/images/frsGained2.webp';
-import frsLostImage from '../../../assets/images/frsLost.jpg';
+import frsTotalImage from '../../../assets/images/coe.avif';
+import frsGainedImage from '../../../assets/images/skill.avif';
+import frsLostImage from '../../../assets/images/academics.jpg';
 
 const Dashboard = () => {
   const [frsData, setFrsData] = useState([]);
@@ -106,48 +107,50 @@ const Dashboard = () => {
   const filteredData = getDummyDataForCategory(filter);
 
   return (
-    <div className='main'>
-      <div className="text2">Verticalwise FRS</div>
-      {/* Vertical Section */}
-      <div className='vertical'>
-        <div className='vertical1' onClick={() => handleFilterChange('Academics')}>Academics</div>
-        <div className='vertical2' onClick={() => handleFilterChange('Skill')}>Skill</div>
-        <div className='vertical3' onClick={() => handleFilterChange('Special Lab')}>Special Lab</div>
-        <div className='vertical4' onClick={() => handleFilterChange('COE')}>COE</div>
-      </div>
-
-
-      <div className='body'>
-        {/* Left Side Section */}
+    <div className='body'>
+      {/* Left Side Section */}
       <div className="left-grid">
+        {/* Profile Card Section */}
+        <div className="profile">
+          <div className="profile-details">
+            <div className="profile-text" style={{ color: '#424242', fontWeight: 'bold', fontSize: '20px', marginBottom: '4px' }}>Nithish Kumar S</div>
+            <div className="profile-text" style={{ color: '#616161', marginBottom: '4px' }}>7376231ABE123</div>
+            <div className="profile-text" style={{ color: '#616161', marginBottom: '4px', fontStyle: 'italic' }}>nithishkumar@bitsathy.ac.in</div>
+            <div className="profile-text" style={{ color: '#616161', marginBottom: '4px' }}>Assisstant Professor Level III</div>
+            <div className="profile-text" style={{ color: '#616161', marginBottom: '4px' }}>Computer Science and Engineering</div>
+            <div className="profile-text" style={{ color: '#757575', marginBottom: '5px', marginTop: '12px' }}><strong>Verticals :    Skill, Academics and IQAC</strong></div>
+          </div>
+          <div className="profile-image"></div>
+        </div>
         <div className="text">FRS Summary</div>
         {/* FRS Summary Section */}
         <div className="frs-summary">
-          {/* Summary 1 */}
-          <div className="summary summary1">
-            <img className="summary-image" src={frsTotalImage} alt="FRS Total Image" />
-            <div className="summary-text">
-              <span className="summary-title">FRS Total</span>
-              <span className="summary-value" style={{color: '#29B6F6', fontWeight: 'bold'}}>3000</span>
-            </div>
-          </div>
-          {/* Summary 2 */}
-          <div className="summary summary2">
-            <img className="summary-image" src={frsGainedImage} alt="FRS Gained Image" />
-            <div className="summary-text">
-              <span className="summary-title">FRS Gained</span>
-              <span className="summary-value" style={{color: '#00C853', fontWeight: 'bold'}}>3600</span>
-            </div>
-          </div>
-          {/* Summary 3 */}
-          <div className="summary summary3">
-            <img className="summary-image" src={frsLostImage} alt="FRS Lost Image" />
-            <div className="summary-text">
-              <span className="summary-title">FRS Lost</span>
-              <span className="summary-value" style={{color: '#FF3D00', fontWeight: 'bold'}}>-600</span>
-            </div>
-          </div>
-        </div>
+  {/* Summary 1 */}
+  <div className="summary summary1">
+    <img className="summary-image" src={frsTotalImage} alt="FRS Total Image" />
+    <div className="summary-text">
+      <span className="summary-title">FRS Total</span>
+      <span className="summary-value" style={{color: '#29B6F6', fontWeight: 'bold'}}>3000</span>
+    </div>
+  </div>
+  {/* Summary 2 */}
+  <div className="summary summary2">
+    <img className="summary-image" src={frsGainedImage} alt="FRS Gained Image" />
+    <div className="summary-text">
+      <span className="summary-title">FRS Gained</span>
+      <span className="summary-value" style={{color: '#00C853', fontWeight: 'bold'}}>3600</span>
+    </div>
+  </div>
+  {/* Summary 3 */}
+  <div className="summary summary3">
+    <img className="summary-image" src={frsLostImage} alt="FRS Lost Image" />
+    <div className="summary-text">
+      <span className="summary-title">FRS Lost</span>
+      <span className="summary-value" style={{color: '#FF3D00', fontWeight: 'bold'}}>-600</span>
+    </div>
+  </div>
+</div>
+
 
         <div className="text">Monthwise FRS Score for this Current Semester is represented Graphically</div>
         {/* FRS Growth Chart Section */}
@@ -175,13 +178,19 @@ const Dashboard = () => {
 
       {/* Right Side Section */}
       <div className='right-grid'>
+        <div className="text">Verticalwise FRS</div>
+        {/* Verticalwise Section */}
+        <div className='vertical'>
+          <div className='vertical1' onClick={() => handleFilterChange('Academics')}>Academics</div>
+          <div className='vertical2' onClick={() => handleFilterChange('Skill')}>Skill</div>
+          <div className='vertical3' onClick={() => handleFilterChange('Special Lab')}>Special Lab</div>
+          <div className='vertical4' onClick={() => handleFilterChange('COE')}>COE</div>
+          {/* <div className='vertical5' onClick={() => handleFilterChange('IQAC')}>IQAC</div> */}
+        </div>
         <div className="text">Recent Updates</div>
         {/* Recent Updates Section */}
         <div className='recent-frs'>Recent Updates</div>
       </div>
-      </div>
-
-      
     </div>
   );
 };
