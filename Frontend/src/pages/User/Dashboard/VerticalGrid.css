@@ -43,14 +43,16 @@
 .vertical-text {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  margin-left: 80px;
+  margin-top: -40px;
   width: 100%;
 }
 
 .vertical-title {
   font-size: 17px;
   font-weight: bold;
-  margin-top: 10px; /* Add margin to create space below the icon */
+  margin-top: 0px;
+  margin-left: 10px;
 }
 
 .vertical-value {

@@ -2,14 +2,13 @@ import React from 'react';
 import './LoginPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import authImage from '../../../assets/images/auth.png';
-import logoImage from '../../../assets/images/logo.png';
+import authImage from '../../assets/images/auth.png';
+import logoImage from '../../assets/images/logo.png';
 
-const LoginPage = () => {
-  // Function to handle Google sign-in
+const LoginPage = ({ onLogin }) => {
   const handleGoogleSignIn = () => {
-    // Implement Google sign-in functionality here
-    console.log('Signing in with Google...');
+    // Call the onLogin function passed via props
+    onLogin();
   };
 
   return (
@@ -18,7 +17,7 @@ const LoginPage = () => {
         <div className='left'>
           <h1 className="login-title">Faculty Worklog</h1>
           <p className="login-subtitle">
-          A teacher is a great listener of knowledge, prosperity, and light, from which we can benefit greatly throughout our life
+            A teacher is a great listener of knowledge, prosperity, and light, from which we can benefit greatly throughout our life
           </p>
           <div className="login-illustration">
             <img src={authImage} alt="Illustration" />
