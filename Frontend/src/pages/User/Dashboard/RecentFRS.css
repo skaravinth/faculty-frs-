@@ -1,0 +1,84 @@
+.recent-frs {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: dimgray;
+}
+
+.recent-frs-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  outline: 1px solid #007bff;
+}
+
+.recent-frs-table th, .recent-frs-table td {
+  padding: 8px;
+  text-align: left;
+}
+
+.recent-frs-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.recent-frs-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.recent-frs-table tr:hover {
+  background-color: #ddd;
+}
+
+.recent-frs-table td {
+  border-bottom: 1px solid #007bff;
+}
+
+.recent-frs-table th:first-child,
+.recent-frs-table td:first-child {
+  border-top-left-radius: 5px;
+}
+
+.recent-frs-table th:last-child,
+.recent-frs-table td:last-child {
+  border-top-right-radius: 8px;
+}
+
+.frs-value.positive {
+  color: green;
+  font-weight: bold;
+}
+
+.frs-value.negative {
+  color: red;
+  font-weight: bold;
+}
+
+.view-button {
+  background-color: #E3F2FD; /* Light background color */
+  border: 1px solid #1e90ff; /* Outline color */
+  padding: 5px 10px; /* Some padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e90ff;
+}
+
+.view-button:hover {
+  background-color: #bbdefb; /* Lighter background color on hover */
+}
+
+.view-button:focus {
+  outline: none; /* Remove default focus outline */
+}
+
+.view-button:active {
+  background-color: #90caf9; /* Darker background color on click */
+}

@@ -138,7 +138,7 @@ export default function Navbar() {
   const [profileAnchorEl, setProfileAnchorEl] = useState(null); // State for profile popover anchor element
 
   const isMobile = useMediaQuery('(max-width:500px)');
-  const isTablet = useMediaQuery('(max-width:1024px)');
+  const isTablet = useMediaQuery('(max-width:1200px)');
 
   useEffect(() => {
     if (isMobile || isTablet) {

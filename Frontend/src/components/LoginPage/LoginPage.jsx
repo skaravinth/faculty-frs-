@@ -1,11 +1,11 @@
 import React from 'react';
-import './VerticalFRS.css';
+import './LoginPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import authImage from '../../../assets/images/auth.png';
 import logoImage from '../../../assets/images/logo.png';
 
-const VerticalwiseFRS = () => {
+const LoginPage = () => {
   // Function to handle Google sign-in
   const handleGoogleSignIn = () => {
     // Implement Google sign-in functionality here
@@ -41,4 +41,4 @@ const VerticalwiseFRS = () => {
   );
 };
 
-export default VerticalwiseFRS;
+export default LoginPage;
