@@ -1,3 +1,7 @@
+body {
+  background-image: url('../../assets/images/login_back.png');
+}
+
 .login-container {
   display: grid;
   height: auto;
@@ -8,11 +12,13 @@
   outline: 1px solid #E0E0E0;
   border-radius: 10px;
   width: 100%;
-  max-width: 2000px;
+  max-width: 1200px; /* Reduce max-width for a smaller container */
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 10px; /* Adjust padding as needed */
+  padding: 20px; /* Adjust padding as needed */
+  margin: 50px auto; /* Center the container and add margin for spacing */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Add subtle shadow for better look */
 }
 
 .left {
@@ -54,7 +60,7 @@
 .login-illustration img {
   max-width: 100%;
   height: auto;
-  margin-top: 160px;
+  margin-top: 40px;
 }
 
 .login-right {
@@ -62,7 +68,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 90px;
+  padding: 40px; /* Reduce padding for better spacing */
   background-color: #fff;
 }
 
@@ -109,18 +115,17 @@
 }
 
 .login-button-google:hover {
-  background-color: #c13525; /* Darker shade of Google red */
+  background-color: #448AFF; /* Darker shade of Google red */
 }
 
 .google-icon {
   margin-right: 10px;
 }
 
-
-
 @media (max-width: 768px) {
   .login-container {
     grid-template-columns: 1fr;
+    max-width: 90%; /* Ensure responsiveness */
   }
 
   .login-illustration {
