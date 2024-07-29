@@ -1,8 +1,8 @@
 import React from 'react';
 import './FRSSummary.css';
-import frsTotalImage from '../../../assets/images/frsTotal.avif';
-import frsGainedImage from '../../../assets/images/frsGained2.webp';
-import frsLostImage from '../../../assets/images/frsLost.jpg';
+import frsTotalImage from '../../../assets/images/frs_total.png';
+import frsGainedImage from '../../../assets/images/frs_gained.png';
+import frsLostImage from '../../../assets/images/frs_lost.png';
 
 function FRSSummary() {
   return (
@@ -25,7 +25,7 @@ function FRSSummary() {
       <img className="summary-image" src={frsLostImage} alt="FRS Lossed Image" />
        <div className="summary-text">
          <span className="summary-title">FRS Lossed</span>
-         <span className="summary-value" style={{color: '#FF3D00', fontWeight: 'bold'}}>3600</span>
+         <span className="summary-value" style={{color: '#FF3D00', fontWeight: 'bold'}}>600</span>
        </div>
       </div>
     </div>

@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './FRSChart.css';
 import FRSLineChart from '../../../components/Graph/FRSLineChart';
 import SortIcon from '@mui/icons-material/Sort';
 
-// Define the frsData array or object here
 const frsData = [
   { month: 'March', score: 10 },
   { month: 'April', score: 70 },
@@ -79,11 +78,25 @@ function FRSChart() {
     setShowDropdown(false);
   };
 
+  // Close dropdown when clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className='frs-chart'>
       <div className='filter-dropdown' ref={dropdownRef}>
         <button className="filter-button" onClick={() => setShowDropdown(!showDropdown)}>
-          <SortIcon className="filter-button-icon" /> {/* Icon */}
+          <SortIcon className="filter-button-icon" />
         </button>
         {showDropdown && (
           <ul className="filter-menu">
@@ -96,7 +109,6 @@ function FRSChart() {
           </ul>
         )}
       </div>
-      {/* Display selected vertical in FRS chart section */}
       <div className='selected-vertical'>{selectedVertical}</div>
       <div className="chart-container">
         <FRSLineChart data={filteredData} />

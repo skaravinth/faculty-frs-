@@ -131,7 +131,7 @@ const adminMenuItems = [
 export default function Navbar() {
   const theme = useTheme();
   const [open, setOpen] = useState(true);
-  const [userRole, setUserRole] = useState('user'); // 'user', 'vertical_head', 'admin'
+  const [userRole, setUserRole] = useState('admin'); // 'user', 'vertical_head', 'admin'
   const [anchorEl, setAnchorEl] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null); // State for notification popover anchor element

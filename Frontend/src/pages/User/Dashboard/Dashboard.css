@@ -5,7 +5,7 @@ body {
 }
 
 .main {
-  padding: 0px;
+  padding: 20px;
 }
 
 .side-grids {
@@ -16,24 +16,22 @@ body {
 }
 
 .left-grid {
-  flex: 1;
   padding: 0px;
-  margin-right: 10px;
-  box-sizing: border-box;
-  height: auto;
   border-radius: 10px;
-  width: 100%;
+  background-color: none; /* Example background color */
 }
 
 .right-grid {
-  flex: 1;
   padding: 0px;
-  margin-left: 0px;
-  margin-top: 0px;
-  width: 100%;
-  box-sizing: border-box;
-  height: auto;
   border-radius: 10px;
+  background-color: none; /* Example background color */
+  position: relative; /* Relative positioning for absolute button */
+}
+
+.recent-note {
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .text {
@@ -42,18 +40,60 @@ body {
   font-weight: bold;
   text-align: left;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .text2 {
-  margin-bottom: 10px;
   font-size: 17px;
   color: dimgray;
   font-weight: bold;
   text-align: left;
+  margin-bottom: 10px;
+  display: inline-block; /* Ensure text and button are aligned horizontally */
+}
+
+.text3 {
+  font-size: 14px;
+  color: red;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.view-all-button {
+  background-color: #E3F2FD; /* Light background color */
+  border: 1px solid #1e90ff; /* Outline color */
+  padding: 6px 12px; /* Padding */
+  margin-right: 20px;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+  color: #1e90ff;
+  position: absolute; /* Position absolute for precise positioning */
+  right: 0; /* Align button to the right */
+  top: 0; /* Align button to the top */
+  margin-top: 8px;
+}
+
+.view-all-button:hover {
+  background-color: #bbdefb; /* Lighter background color on hover */
+}
+
+.view-all-button:focus {
+  outline: none; /* Remove default focus outline */
+}
+
+.view-all-button:active {
+  background-color: #90caf9; /* Darker background color on click */
 }
 
 @media (max-width: 1200px) {
   .side-grids {
     grid-template-columns: 1fr;
+  }
+
+  .left-grid,
+  .right-grid {
+    margin-right: 0;
+    margin-left: 0;
   }
 }

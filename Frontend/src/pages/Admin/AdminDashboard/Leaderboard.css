@@ -1,0 +1,20 @@
+.grid-full2 {
+    background-color: pink;
+    border-radius: 5px;
+    width: calc(66.67% - 10px);
+    height: auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .grid2-head {
+    color: #616161;
+    font-weight: bold;
+    align-self: flex-start;
+    text-align: left;
+    margin-left: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+   
+  

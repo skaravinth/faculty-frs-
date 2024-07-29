@@ -1,0 +1,36 @@
+.verticalwise {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.grid {
+  background-color: white;
+  flex: 1;
+  margin: 5px 10px 5px 0px;
+  padding: 20px;
+  text-align: center;
+  border-radius: 5px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+
+.grid img {
+  width: 30px;
+  height: 30px;
+}
+
+.icon {
+  font-size: 6px;
+  margin-bottom: 10px;
+}
+
+.name {
+  font-size: 15px;
+  color: #1976D2;
+  font-weight: bold;
+}
