@@ -36,4 +36,18 @@
     font-size: 18px;
     margin-top: 4px;
   }
+
+  @media (max-width: 768px) {
+    .summary-image {
+      height: 40px;
+      width: 40px;
+      margin: 10px;
+    }
+    .summary-title {
+      font-size: 14px;
+    }
+    .summary-value {
+      font-size: 20px;
+    }
+  }
   

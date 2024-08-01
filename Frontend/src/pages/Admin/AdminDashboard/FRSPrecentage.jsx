@@ -1,5 +1,6 @@
 import React from 'react';
 import './FRSPercentage.css';
+import PieCharts from '../../../components/Graph/PieChart';
 
 function FRSPercentage() {
   return (
@@ -7,6 +8,7 @@ function FRSPercentage() {
       <div className='grid-head'>
         FRS Percentage accross Verticals
       </div>
+      <PieCharts />
     </div>
   );
 }

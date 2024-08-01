@@ -1,77 +1,125 @@
-.vertical {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+.verticalwise {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.vertical > div {
+.grid {
+  background-color: white;
+  flex: 1;
+  margin: 5px 10px 5px 0px;
   padding: 20px;
-  border-radius: 25px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border-radius: 5px;
+  height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: white;
-  text-align: center;
 }
 
-.vertical-content {
-  display: flex;
-  
-  width: 100%;
+.grid img {
+  width: 50px;
+  height: 50px;
 }
 
-.fa-icon {
-  font-size: 35px;
-  margin-right: 15px;
+.icon {
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
-.fa-image {
-  margin-left: 20px;
-}
-
-.vertical-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.vertical-title {
-  font-size: 17px;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.vertical-value {
-  font-size: 16px;
+.name {
+  font-size: 18px;
+  color: #1976D2;
   font-weight: bold;
 }
 
-.vertical-frs {
-  font-size: 20px;
+.frs-title {
+  color: blue;
+}
+
+.frs-score {
+  color: #2e7d32;
+  font-size: 30px;
+  margin-top: 20px;
   font-weight: bold;
-  margin-top: 5px;
 }
 
-.vertical1 {
-  background-color: #1E90FF;
+@media (max-width: 1024px) {
+  .grid {
+    height: 150px;
+  }
+  .grid img {
+    width: 40px;
+    height: 40px;
+  }
+  .name {
+    font-size: 18px;
+  }
+  .frs-score {
+    font-size: 20px;
+    margin-top: 8px;
+  }
 }
 
-.vertical2 {
-  background-color: #F5C525;
+@media (max-width: 920px) {
+  .grid {
+    height: 150px;
+  }
+  .grid img {
+    width: 35px;
+    height: 35px;
+  }
+  .name {
+    font-size: 16px;
+  }
+  .frs-score {
+    font-size: 20px;
+    margin-top: 6px;
+  }
 }
 
-.vertical3 {
-  background-color: #FF9062;
+@media (max-width: 860px) {
+  .grid {
+    height: 120px;
+  }
+  .grid img {
+    width: 25px;
+    height: 25px;
+  }
+  .name {
+    font-size: 15px;
+  }
+  .frs-score {
+    font-size: 18px;
+    margin-top: 4px;
+  }
 }
 
-.vertical4 {
-  background-color: #3ACBE8;
+@media (max-width: 800px) {
+  .verticalwise {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .grid {
+    margin: 10px 0;
+  }
 }
 
-@media (max-width: 1200px) {
-  .vertical {
+@media (max-width: 768px) {
+  .verticalwise {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .grid img {
+    width: 35px;
+    height: 35px;
+  }
+  .name {
+    font-size: 18px;
+  }
+  .frs-score {
+    font-size: 20px;
   }
 }

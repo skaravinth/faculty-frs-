@@ -1,61 +1,44 @@
 import React from 'react';
 import './VerticalGrid.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileContract, faGraduationCap, faBook, faFlaskVial } from '@fortawesome/free-solid-svg-icons';
+import academicsImage from '../../../assets/images/academics.png';
+import coeImage from '../../../assets/images/coe.png';
+import iqacImage from '../../../assets/images/iqac.png';
+import skillImage from '../../../assets/images/skill.png';
+import specialLabImage from '../../../assets/images/special_lab.png';
+import styled from 'styled-components';
 
 function VerticalGrid() {
+
+  const earned = 80;
+  const lost = 20;
+  const total = 100;
+
   return (
-    <div className="vertical">
-      <div className='vertical1'>
-        <div className='vertical-content'>
-          <div className='fa-icon'>
-            <FontAwesomeIcon icon={faGraduationCap} className="fa-image" />
-          </div>
-          <div className="vertical-text" style={{marginLeft: '100px'}}>
-            <span className="vertical-value">FRS</span>
-            <span className='vertical-frs'>1200</span>
-          </div>
-        </div>
-        <span className="vertical-title" style={{marginRight: '110px'}}>Academics</span>
+    <div className="verticalwise">
+      <div className="grid">
+        <img src={academicsImage} alt="Academics" className="icon" />
+        <div className="name">Academics</div>
+           <div className='frs-score'>1700</div>
       </div>
-
-      <div className='vertical2'>
-        <div className='vertical-content'>
-          <div className='fa-icon'>
-            <FontAwesomeIcon icon={faBook} className="fa-image" />
-          </div>
-          <div className="vertical-text" style={{marginLeft: '110px'}}>
-            <span className="vertical-value">FRS</span>
-            <span className='vertical-frs'>800</span>
-          </div>
-        </div>
-        <span className="vertical-title" style={{marginRight: '160px'}}>Skill</span>
+      <div className="grid">
+        <img src={coeImage} alt="COE" className="icon" />
+        <div className="name">COE</div>
+           <div className='frs-score'>300</div>
       </div>
-
-      <div className='vertical3'>
-        <div className='vertical-content'>
-          <div className='fa-icon'>
-            <FontAwesomeIcon icon={faFileContract} className="fa-image" />
-          </div>
-          <div className="vertical-text" style={{marginLeft: '120px'}}>
-            <span className="vertical-value">FRS</span>
-            <span className='vertical-frs'>550</span>
-          </div>
-        </div>
-        <span className="vertical-title" style={{marginRight: '110px'}}>Special Lab</span>
+      <div className="grid">
+        <img src={iqacImage} alt="IQAC" className="icon" />
+        <div className="name">IQAC</div>
+           <div className='frs-score'>570</div>
       </div>
-
-      <div className='vertical4'>
-        <div className='vertical-content'>
-          <div className='fa-icon'>
-            <FontAwesomeIcon icon={faFlaskVial} className="fa-image" />
-          </div>
-          <div className="vertical-text" style={{marginLeft: '100px'}}>
-            <span className="vertical-value">FRS</span>
-            <span className='vertical-frs'>450</span>
-          </div>
-        </div>
-        <span className="vertical-title" style={{marginRight: '160px'}}>COE</span>
+      <div className="grid">
+        <img src={skillImage} alt="Skill" className="icon" />
+        <div className="name">Skill</div>
+           <div className='frs-score'>430</div>
+      </div>
+      <div className="grid">
+        <img src={specialLabImage} alt="Special Lab" className="icon" />
+        <div className="name">SpecialLab</div>
+           <div className='frs-score'>1000</div>
       </div>
     </div>
   );

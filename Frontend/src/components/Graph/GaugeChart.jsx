@@ -1,52 +1,63 @@
 import React, { useState } from 'react';
-import GaugeChart from 'react-gauge-chart';
-import './GaugeChart.css'; // Import the CSS file for styling
+import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 
-// Sample data
-const sampleData = {
-  positivePoints: 70,
-  negativePoints: 30,
-  totalPoints: 100,
-};
+const GaugeChart = ({ earned, lost, total }) => {
+  // Calculate the gauge value based on earned and total
+  const gaugeValue = (earned / total) * 100;
 
-// Calculate percentages
-const positivePercentage = (sampleData.positivePoints / sampleData.totalPoints) * 100;
-const negativePercentage = (sampleData.negativePoints / sampleData.totalPoints) * 100;
+  // State for tooltip visibility
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
 
-// Renamed local component to avoid conflict
-const GaugeChartDisplay = () => {
-  const [hovered, setHovered] = useState(false);
+  // Handle mouse enter and leave events to show/hide tooltip
+  const handleMouseEnter = () => setTooltipVisible(true);
+  const handleMouseLeave = () => setTooltipVisible(false);
 
   return (
-    <div
-      className="gauge-wrapper"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div className="gauge-chart">
-        <GaugeChart
-          id="gauge-chart1"
-          nrOfLevels={30}
-          percent={positivePercentage / 100}
-          arcWidth={0.2}
-          textColor="#333"
-          needleColor="#333"
-          colors={['#4CAF50', '#FFC107']} // Green for positive, Amber for negative
-          style={{ width: '200px', height: '200px' }}
-        />
-      </div>
-      <div className={`tooltip ${hovered ? 'visible' : 'hidden'}`}>
-        <div className="tooltip-item">
-          <div className="tooltip-label">Positive Score:</div>
-          <div className="tooltip-value">{positivePercentage.toFixed(2)}%</div>
+    <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+      <Gauge
+        width={100}
+        height={100}
+        value={gaugeValue}
+        cornerRadius="50%"
+        sx={(theme) => ({
+          [`& .${gaugeClasses.valueText}`]: {
+            fontSize: 30,
+            color: theme.palette.primary.contrastText,
+          },
+          [`& .${gaugeClasses.valueArc}`]: {
+            fill: '#52b202',
+          },
+          [`& .${gaugeClasses.referenceArc}`]: {
+            fill: theme.palette.text.disabled,
+          },
+        })}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      />
+      {isTooltipVisible && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -150%)',
+            textAlign: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'opacity 0.3s ease',
+            opacity: isTooltipVisible ? 1 : 0,
+          }}
+        >
+          <div><strong>Earned:</strong> {earned}</div>
+          <div><strong>Lost:</strong> {lost}</div>
         </div>
-        <div className="tooltip-item">
-          <div className="tooltip-label">Negative Score:</div>
-          <div className="tooltip-value">{negativePercentage.toFixed(2)}%</div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default GaugeChartDisplay;
+export default GaugeChart;

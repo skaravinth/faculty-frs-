@@ -5,7 +5,7 @@
   margin-bottom: 30px;
 }
 
-.grid {
+.grid1 {
   background-color: white;
   flex: 1;
   margin: 5px 10px 5px 0px;
@@ -19,17 +19,17 @@
   
 }
 
-.grid img {
+.grid1 img {
   width: 30px;
   height: 30px;
 }
 
-.icon {
+.icon1 {
   font-size: 6px;
   margin-bottom: 10px;
 }
 
-.name {
+.name2 {
   font-size: 15px;
   color: #1976D2;
   font-weight: bold;

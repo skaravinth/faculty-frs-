@@ -81,6 +81,7 @@
 }
 
 .chart-container {
+  margin-top: 10px;
   width: auto; /* Occupy full width within .frs-chart */
   height: auto; /* Set a fixed height for the chart container */
 }
