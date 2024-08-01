@@ -10,9 +10,21 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+  ChartDataLabels
+);
 
 const FRSLineChart = ({ data }) => {
   const chartData = {
@@ -21,16 +33,42 @@ const FRSLineChart = ({ data }) => {
       {
         label: 'FRS Score',
         data: data.map(item => item.score),
-        borderColor: '#3498DB', // Blue color for line
-        backgroundColor: 'rgba(52, 152, 219, 0.1)', // Light blue fill color
-        borderWidth: 2, // Line width
-        pointBackgroundColor: '#3498DB', // Blue color for points
-        pointRadius: 4, // Point size
-        pointHoverRadius: 6, // Point size on hover
-        tension: 0.4, // Curve tension
-        fill: true, // Fill area under the line
+        borderColor: '#007BFF', // Primary blue color
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return null;
+          return getGradient(ctx, chartArea);
+        },
+        borderWidth: 3,
+        pointBackgroundColor: '#007BFF',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        tension: 0.3,
+        fill: true,
+        datalabels: {
+          color: '#007BFF',
+          display: true,
+          align: 'end',
+          anchor: 'end',
+          offset: 8,
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+          formatter: (value) => value.toFixed(2),
+        },
       },
     ],
+  };
+
+  const getGradient = (ctx, chartArea) => {
+    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+    gradient.addColorStop(0, 'rgba(0, 123, 255, 0.3)'); // Light blue start
+    gradient.addColorStop(1, 'rgba(0, 123, 255, 0)'); // Transparent end
+    return gradient;
   };
 
   const options = {
@@ -41,16 +79,48 @@ const FRSLineChart = ({ data }) => {
         position: 'top',
         labels: {
           font: {
-            size: 14, // Legend font size
+            size: 16,
+            weight: 'bold',
           },
+          color: '#333',
         },
       },
       title: {
         display: true,
         text: 'Monthly FRS Score',
         font: {
-          size: 20, // Title font size
+          size: 22,
+          weight: 'bold',
         },
+        color: '#333',
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        cornerRadius: 6,
+        padding: 12,
+        xAlign: 'center',
+        yAlign: 'bottom',
+        callbacks: {
+          label: function(tooltipItem) {
+            return `Score: ${tooltipItem.raw.toFixed(2)}`;
+          },
+        },
+      },
+      datalabels: {
+        color: '#007BFF',
+        display: true,
+        align: 'end',
+        anchor: 'end',
+        font: {
+          weight: 'bold',
+          size: 12,
+        },
+        padding: {
+          bottom: 8,
+        },
+        formatter: (value) => value.toFixed(2),
       },
     },
     scales: {
@@ -60,21 +130,39 @@ const FRSLineChart = ({ data }) => {
         },
         ticks: {
           font: {
-            size: 12, // X-axis label font size
+            size: 14,
+            color: '#666',
           },
         },
       },
       y: {
         grid: {
-          color: '#ECF0F1', // Light gray grid color
+          color: '#ddd', // Light gray grid color
+          lineWidth: 1,
         },
         beginAtZero: true,
         ticks: {
           font: {
-            size: 12, // Y-axis label font size
+            size: 14,
+            color: '#666',
           },
         },
       },
+    },
+    elements: {
+      line: {
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round',
+        borderWidth: 4, // Slightly thicker line
+      },
+      point: {
+        hoverBackgroundColor: '#28A745', // Green on hover
+        hoverBorderColor: '#fff',
+      },
+    },
+    animation: {
+      duration: 1500,
+      easing: 'easeInOutCubic',
     },
   };
 

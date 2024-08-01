@@ -8,10 +8,6 @@ body {
   padding: 20px;
 }
 
-.top {
-  display: grid;
-}
-
 .text1, .text2, .text3, .text4, .text5 {
   color: #616161;
   font-size: 16px;
@@ -118,6 +114,8 @@ body {
     width: 100%;
   }
 }
+
+
 
 
 

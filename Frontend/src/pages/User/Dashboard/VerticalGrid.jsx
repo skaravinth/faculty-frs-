@@ -5,13 +5,8 @@ import coeImage from '../../../assets/images/coe.png';
 import iqacImage from '../../../assets/images/iqac.png';
 import skillImage from '../../../assets/images/skill.png';
 import specialLabImage from '../../../assets/images/special_lab.png';
-import styled from 'styled-components';
 
 function VerticalGrid() {
-
-  const earned = 80;
-  const lost = 20;
-  const total = 100;
 
   return (
     <div className="verticalwise">

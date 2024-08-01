@@ -20,7 +20,7 @@ function Dashboard() {
     <div className="main">
       <div className='top'>
         <div className="text1">Verticalwise FRS Score</div>
-        <VerticalGrid items={verticalItems} />
+        <VerticalGrid  />
       </div>
 
       <div className="side-grids">
