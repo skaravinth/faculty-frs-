@@ -27,6 +27,8 @@ ChartJS.register(
 );
 
 const FRSLineChart = ({ data }) => {
+  const showDataLabels = window.innerWidth > 768;
+
   const chartData = {
     labels: data.map(item => item.month),
     datasets: [
@@ -49,8 +51,8 @@ const FRSLineChart = ({ data }) => {
         tension: 0.3,
         fill: true,
         datalabels: {
+          display: showDataLabels,
           color: '#007BFF',
-          display: true,
           align: 'end',
           anchor: 'end',
           offset: 8,
@@ -95,6 +97,7 @@ const FRSLineChart = ({ data }) => {
         color: '#333',
       },
       tooltip: {
+        enabled: true,
         backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black
         titleColor: '#ffffff',
         bodyColor: '#ffffff',
@@ -103,24 +106,10 @@ const FRSLineChart = ({ data }) => {
         xAlign: 'center',
         yAlign: 'bottom',
         callbacks: {
-          label: function(tooltipItem) {
+          label: function (tooltipItem) {
             return `Score: ${tooltipItem.raw.toFixed(2)}`;
           },
         },
-      },
-      datalabels: {
-        color: '#007BFF',
-        display: true,
-        align: 'end',
-        anchor: 'end',
-        font: {
-          weight: 'bold',
-          size: 12,
-        },
-        padding: {
-          bottom: 8,
-        },
-        formatter: (value) => value.toFixed(2),
       },
     },
     scales: {
