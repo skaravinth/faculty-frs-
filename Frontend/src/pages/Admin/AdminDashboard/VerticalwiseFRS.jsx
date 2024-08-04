@@ -5,40 +5,41 @@ import coeImage from '../../../assets/images/coe.png';
 import iqacImage from '../../../assets/images/iqac.png';
 import skillImage from '../../../assets/images/skill.png';
 import specialLabImage from '../../../assets/images/special_lab.png';
-import GaugeChart from '../../../components/Graph/GaugeChart.jsx';
 import { useNavigate } from 'react-router-dom';
 
 function VerticalwiseFRS() {
-
   const navigate = useNavigate();
 
-const handleVerticalClick = () => {
+  const handleVerticalClick = () => {
     navigate('/head-dashboard');
   };
 
+  const verticals = [
+    { name: 'Academics', image: academicsImage, positiveScore: 12300, negativeScore: -2300 },
+    { name: 'COE', image: coeImage, positiveScore: 8900, negativeScore: -2900 },
+    { name: 'IQAC', image: iqacImage, positiveScore: 7600, negativeScore: -1600 },
+    { name: 'Skill', image: skillImage, positiveScore: 10500, negativeScore: -1500 },
+    { name: 'Special Lab', image: specialLabImage, positiveScore: 9400, negativeScore: -1400 },
+  ];
+
   return (
     <div className="verticalwise1">
-      <div className="grid6" onClick={handleVerticalClick}>
-        <img src={academicsImage} alt="Academics" className="icon1" />
-        <div className="name2">Academics</div>
-        <GaugeChart />
-      </div>
-      <div className="grid6" onClick={handleVerticalClick}>
-        <img src={coeImage} alt="COE" className="icon1" />
-        <div className="name2">COE</div>
-      </div>
-      <div className="grid6" onClick={handleVerticalClick}>
-        <img src={iqacImage} alt="IQAC" className="icon1" />
-        <div className="name2">IQAC</div>
-      </div>
-      <div className="grid6" onClick={handleVerticalClick}>
-        <img src={skillImage} alt="Skill" className="icon1" />
-        <div className="name2">Skill</div>
-      </div>
-      <div className="grid6" onClick={handleVerticalClick}>
-        <img src={specialLabImage} alt="Special Lab" className="icon1" />
-        <div className="name2">Special Lab</div>
-      </div>
+      {verticals.map((vertical, index) => (
+        <div className="grid6" key={index} onClick={handleVerticalClick}>
+          <img src={vertical.image} alt={vertical.name} className="icon1" />
+          <div className="name2">{vertical.name}</div>
+          <div className='score'>
+            <div className="positive-score">
+              <span className="score-icon">▲</span>
+              {vertical.positiveScore}
+            </div>
+            <div className="negative-score">
+              <span className="score-icon">▼</span>
+              {vertical.negativeScore}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -12,8 +12,8 @@ import Admin from '../pages/Admin/AdminDashboard/Admin';
 import VerticalwiseFRS from '../pages/Admin/FRSVertical/FRSVertical';
 import DepartmentwiseFRS from '../pages/Admin/FRSDepartment/FRSDepartment';
 import Leaderboard from '../pages/Admin/Leaderboard/Leaderboard';
-import FacultyEntry from '../pages/Admin/FacultyEntry/FacultyEntry';
 import LoginPage from '../components/LoginPage/LoginPage'; // Adjust the import path as needed
+import FacultyFRS from '../pages/Admin/FacultyList/FacultyFRS';
 
 const AppLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,7 +53,7 @@ const AppLayout = () => {
                 <Route path="/verticalwise-frs" element={<VerticalwiseFRS />} />
                 <Route path="/departmentwise-frs" element={<DepartmentwiseFRS />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/faculty-entry" element={<FacultyEntry />} />
+                <Route path="/faculty-entry" element={<FacultyFRS />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>

@@ -1,124 +1,4 @@
-/* General Popup Styles */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
-}
 
-.popup {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  width: 600px;
-  max-width: 90%;
-  padding: 20px;
-  position: relative;
-  text-align: left;
-  animation: slideIn 0.3s ease;
-}
-
-/* Popup Header */
-.popup-header {
-  display: flex;
-  justify-content: center; /* Center the heading */
-  align-items: center; /* Center vertically */
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.popup-header h2 {
-  font-size: 1.3em;
-  color: #42A5F5;
-  margin-bottom: 20px;
-  margin-left: 190px;
-}
-
-.close-button {
-  position: absolute;
-  right: 20px;
-  top: 15px;
-  background: none;
-  border: none;
-  font-size: 1em;
-  color: #333;
-  cursor: pointer;
-}
-
-
-.close-button:hover {
-  color: #007bff;
-}
-
-/* Popup Content */
-.popup-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px; /* Space between different content blocks */
-  margin-left: 20px;
-}
-
-.content {
-  display: flex;
-  justify-content: flex-start; /* Align items to the left */
-  align-items: center; /* Vertically center align */
-  margin-bottom: 5px;
-}
-
-.content p {
-  margin: 0;
-  font-size: 1em;
-  margin-right: 60px; /* Space between label and value */
-}
-
-.content p strong {
-  display: inline-block;
-  min-width: 120px; /* Fixed width for labels */
-  font-weight: bold;
-}
-
-.frs-value.positive {
-  color: green;
-  font-weight: bold;
-}
-
-.frs-value.negative {
-  color: red;
-  font-weight: bold;
-}
-
-
-/* Popup Footer */
-.popup-footer {
-  text-align: right;
-  border-top: 1px solid #e9ecef;
-  padding-top: 10px;
-}
-
-.ok-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 1em;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.ok-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
 
 /* Animations */
 @keyframes fadeIn {
@@ -134,7 +14,6 @@
 /* Recent FRS Table Styles */
 .recent-frs {
   background-color: white;
-  
   border-radius: 5px;
   text-align: center;
   margin-bottom: 10px;
@@ -215,4 +94,8 @@
 
 .view-button:active {
   background-color: #90caf9;
+}
+
+@media (max-width: 500px) {
+
 }

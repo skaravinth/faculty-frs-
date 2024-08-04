@@ -27,3 +27,16 @@
 .monthwise-notes {
   color: #c8d8cc;
 }
+
+@media (max-width: 1024px) {
+  .grid-full {
+    width: 100%;
+  }
+}
+
+@media (max-width: 450px) {
+  .chart {
+    font-size: 38px;
+    margin-bottom: 10px;
+  }
+}

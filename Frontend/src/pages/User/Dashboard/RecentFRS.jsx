@@ -47,41 +47,40 @@ function RecentFRS() {
         </tbody>
       </table>
       {selectedRow && (
-  <div className="popup-overlay" onClick={handleClosePopup}>
-    <div className="popup" onClick={(e) => e.stopPropagation()}>
-      <div className="popup-header">
-        <h2>Update Summary</h2>
-        <button className="close-button" onClick={handleClosePopup}>x</button>
-      </div>
-      <div className="popup-content">
-        <div className="content">
-          <p><strong>Date:</strong></p>
-          <p>{selectedRow.date}</p>
+        <div className="popup-overlay" onClick={handleClosePopup}>
+          <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-header">
+              <h2>Update Summary</h2>
+              <button className="close-button" onClick={handleClosePopup}>x</button>
+            </div>
+            <div className="popup-content">
+              <div className="content">
+                <p><strong>Date:</strong></p>
+                <p>{selectedRow.date}</p>
+              </div>
+              <div className="content">
+                <p><strong>Vertical Name:</strong></p>
+                <p>{selectedRow.verticalName}</p>
+              </div>
+              <div className="content">
+                <p><strong>Reason:</strong></p>
+                <p>{selectedRow.reason}</p>
+              </div>
+              <div className="content">
+                <p><strong>Reason Info:</strong></p>
+                <p>{selectedRow.reason_info}</p>
+              </div>
+              <div className="content">
+                <p><strong>FRS Update:</strong></p>
+                <p className={`frs-value ${selectedRow.frsUpdate >= 0 ? 'positive' : 'negative'}`}>{selectedRow.frsUpdate}</p>
+              </div>
+            </div>
+            <div className="popup-footer">
+              <button className="ok-button" onClick={handleClosePopup}>OK</button>
+            </div>
+          </div>
         </div>
-        <div className="content">
-          <p><strong>Vertical Name:</strong></p>
-          <p>{selectedRow.verticalName}</p>
-        </div>
-        <div className="content">
-          <p><strong>Reason:</strong></p>
-          <p>{selectedRow.reason}</p>
-        </div>
-        <div className="content">
-          <p><strong>Reason Info:</strong></p>
-          <p>{selectedRow.reason_info}</p>
-        </div>
-        <div className="content">
-          <p><strong>FRS Update:</strong></p>
-          <p className={`frs-value ${selectedRow.frsUpdate >= 0 ? 'positive' : 'negative'}`}>{selectedRow.frsUpdate}</p>
-        </div>
-      </div>
-      <div className="popup-footer">
-        <button className="ok-button" onClick={handleClosePopup}>OK</button>
-      </div>
-    </div>
-  </div>
-)}
-
+      )}
     </div>
   );
 }

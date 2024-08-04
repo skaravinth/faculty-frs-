@@ -1,0 +1,70 @@
+/* .grid-full2 {
+    background-color: white;
+    border-radius: 5px;
+    width: calc(66.67% - 10px);
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .frs-heading {
+    color: #616161;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 30px;
+    margin-left: 4px;
+  }
+  
+  .back-button3 {
+    display: flex;
+    gap: 8px;
+    margin-top: 30px;
+    border: 1px solid #616161;
+    padding: 6px 8px;
+    width: 90px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #616161;
+    font-size: 17px;
+    background-color: #ffffff;
+    cursor: pointer;
+  }
+  
+  .back-button3:hover {
+    background-color: #e3f2fd;
+    color: #1e88e5;
+    border: 1px solid #1e88e5;
+  }
+  
+  .frs-positive, .frs-negative {
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .frs-positive {
+    color: green;
+  }
+  
+  .frs-negative {
+    color: red;
+  }
+  
+  .data-grid-container {
+    flex: 1;
+    overflow: auto;
+  }
+  
+  .custom-header .MuiDataGrid-columnHeaderTitle {
+    font-weight: bold;
+    color: #1a237e;
+    font-size: 16px;
+  }
+  
+  @media (max-width: 900px) {
+    .grid-full2 {
+      width: 100%;
+    }
+  }
+   */

@@ -110,28 +110,28 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const userMenuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
-  { text: 'Vertical FRS', icon: <VerticalFrsIcon />, link: '/vertical-frs' },
+  // { text: 'Vertical FRS', icon: <VerticalFrsIcon />, link: '/vertical-frs' },
   { text: 'FRS History', icon: <FrsHistoryIcon />, link: '/frs-history' },
 ];
 
 const verticalHeadMenuItems = [
-  { text: 'Head Dashboard', icon: <HeadDashboardIcon />, link: '/head-dashboard' },
-  { text: 'Faculty List', icon: <FacultyListIcon />, link: '/faculty-list' },
-  { text: 'FRS Entry', icon: <FrsEntryIcon />, link: '/frs-entry' },
+  { text: 'Dashboard', icon: <DashboardIcon />, link: '/head-dashboard' },
+  { text: 'Event Entry', icon: <FacultyEntryIcon />, link: '/faculty-list' },
+  { text: 'FRS Update', icon: <FrsEntryIcon />, link: '/frs-entry' },
 ];
 
 const adminMenuItems = [
-  { text: 'Admin', icon: <AdminIcon />, link: '/admin' },
-  { text: 'Verticalwise FRS', icon: <VerticalwiseFrsIcon />, link: '/verticalwise-frs' },
-  { text: 'Departmentwise FRS', icon: <DepartmentwiseFrsIcon />, link: '/departmentwise-frs' },
-  { text: 'Leaderboard', icon: <LeaderboardIcon />, link: '/leaderboard' },
-  { text: 'Faculty Entry', icon: <FacultyEntryIcon />, link: '/faculty-entry' },
+  { text: 'Admin', icon: <DashboardIcon />, link: '/admin' },
+  // { text: 'Verticalwise FRS', icon: <VerticalwiseFrsIcon />, link: '/verticalwise-frs' },
+  // { text: 'Departmentwise FRS', icon: <DepartmentwiseFrsIcon />, link: '/departmentwise-frs' },
+  // { text: 'Leaderboard', icon: <LeaderboardIcon />, link: '/leaderboard' },
+  { text: 'Faculty FRS', icon: <FacultyListIcon />, link: '/faculty-entry' },
 ];
 
 export default function Navbar() {
   const theme = useTheme();
   const [open, setOpen] = useState(true);
-  const [userRole, setUserRole] = useState('user'); // 'user', 'vertical_head', 'admin'
+  const [userRole, setUserRole] = useState('admin'); // 'user', 'vertical_head', 'admin'
   const [anchorEl, setAnchorEl] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null); // State for notification popover anchor element

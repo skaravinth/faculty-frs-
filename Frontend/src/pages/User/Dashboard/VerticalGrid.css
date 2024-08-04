@@ -117,7 +117,7 @@
   }
   .grid {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: -5px;
   }
   .grid img {
     width: 30px;
@@ -135,5 +135,28 @@
 @media (max-width: 600px) {
   .verticalwise {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .verticalwise {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .grid {
+    height: 300px;
+  }  
+  .grid img {
+    width: 110px;
+    height: 110px;
+  }
+  .name {
+    font-size: 28px;
+  }
+  .frs-score {
+    color: #2e7d32;
+    font-size: 40px;
+    margin-top: 20px;
+    font-weight: bold;
   }
 }

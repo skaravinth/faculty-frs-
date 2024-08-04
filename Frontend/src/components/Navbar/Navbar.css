@@ -27,7 +27,7 @@ body {
 
 .MuiAppBar-root {
   transition: width 0.3s ease;
-  z-index: 1201;
+  z-index: 900;
 }
 
 .MuiAppBar-shift {

@@ -2,30 +2,28 @@ import React, { useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 
 const GaugeChart = ({ earned, lost, total }) => {
-  // Calculate the gauge value based on earned and total
   const gaugeValue = (earned / total) * 100;
 
-  // State for tooltip visibility
   const [isTooltipVisible, setTooltipVisible] = useState(false);
 
-  // Handle mouse enter and leave events to show/hide tooltip
   const handleMouseEnter = () => setTooltipVisible(true);
   const handleMouseLeave = () => setTooltipVisible(false);
 
   return (
-    <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+    <div className="gauge-wrapper">
       <Gauge
-        width={100}
-        height={100}
+        className="gauge-chart"
+        width={150}
+        height={150}
         value={gaugeValue}
         cornerRadius="50%"
         sx={(theme) => ({
           [`& .${gaugeClasses.valueText}`]: {
-            fontSize: 30,
+            fontSize: 24,
             color: theme.palette.primary.contrastText,
           },
           [`& .${gaugeClasses.valueArc}`]: {
-            fill: '#52b202',
+            fill: 'url(#gradient)', // Use gradient
           },
           [`& .${gaugeClasses.referenceArc}`]: {
             fill: theme.palette.text.disabled,
@@ -34,26 +32,24 @@ const GaugeChart = ({ earned, lost, total }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#52b202', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#f50057', stopOpacity: 1 }} />
+          </linearGradient>
+        </defs>
+      </svg>
       {isTooltipVisible && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -150%)',
-            textAlign: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            transition: 'opacity 0.3s ease',
-            opacity: isTooltipVisible ? 1 : 0,
-          }}
-        >
-          <div><strong>Earned:</strong> {earned}</div>
-          <div><strong>Lost:</strong> {lost}</div>
+        <div className="tooltip visible">
+          <div className="tooltip-item">
+            <span className="tooltip-label">Earned:</span>
+            <span className="tooltip-value">{earned}</span>
+          </div>
+          <div className="tooltip-item">
+            <span className="tooltip-label">Lost:</span>
+            <span className="tooltip-value">{lost}</span>
+          </div>
         </div>
       )}
     </div>

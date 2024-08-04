@@ -5,7 +5,7 @@ import VerticalwiseFRS from './VerticalwiseFRS';
 import MonthwiseFRS from './MonthwiseFRS';
 import FRSPercentage from './FRSPrecentage';
 import Leaderboard from './Leaderboard';
-import NegativeFRS from './NegativeFRS';
+import EventDetails from './EventDetails';
 
 function Admin() {
   return (
@@ -14,6 +14,9 @@ function Admin() {
         Vertical wise Overview
       </div>
       <VerticalwiseFRS />
+      <div className='verticalwise-tail'>
+        Overall FRS provided for the Faculties in Positive and Negative from each vertical can be seen here
+      </div>
       <div className="grid-container">
         <MonthwiseFRS />
         <FRSPercentage />
@@ -23,7 +26,7 @@ function Admin() {
       </div>
       <RecentUpdates />
       <div className="leaderboard-frs">
-        <NegativeFRS />
+        <EventDetails />
         <Leaderboard />
       </div>
     </div>
