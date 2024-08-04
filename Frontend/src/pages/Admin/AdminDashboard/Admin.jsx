@@ -21,10 +21,10 @@ function Admin() {
         <MonthwiseFRS />
         <FRSPercentage />
       </div>
-      <div className='summary-head'>
+      {/* <div className='summary-head'>
         Summary of Recent Updates
       </div>
-      <RecentUpdates />
+      <RecentUpdates /> */}
       <div className="leaderboard-frs">
         <EventDetails />
         <Leaderboard />
