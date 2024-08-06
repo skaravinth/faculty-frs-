@@ -1,26 +1,46 @@
-import React, { useState } from 'react';
+import  { useEffect, useState } from 'react';
 import './RecentFRS.css';
+import PropTypes from 'prop-types';
 
-function RecentFRS() {
-  const data = [
-    { date: '12-06-2024', verticalName: 'Skill', reason: 'Late Submission', reason_info: 'The given task was not completed on time and it will be considered as late submission', frsUpdate: 50 },
-    { date: '13-06-2024', verticalName: 'Academics', reason: 'Insufficient Data', reason_info: 'The Qusetion Paper taken by you is not having sufficient data in some questions', frsUpdate: -100 },
-    { date: '14-06-2024', verticalName: 'COE', reason: 'Incorrect Entry', reason_info: 'The Entry was not entered properly and it is showing wrong data which is not matching with actuall data', frsUpdate: 150 },
-    { date: '15-06-2024', verticalName: 'IQAC', reason: 'System Error', reason_info: 'The system is not handeled professionally by you and it is showing errors', frsUpdate: -200 },
-    { date: '16-06-2024', verticalName: 'Special Lab', reason: 'Data Mismatch', reason_info: 'The report given by you is showing wrong data and it is not matching with the true data', frsUpdate: 250 },
-  ];
+function RecentFRS({ user }) {
+  const [data, setData] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [error, setError] = useState(null);
 
-  const [selectedRow, setSelectedRow] = useState(null); // State to track selected row for popup
+  useEffect(() => {
+    const facultyId = user.id;
+    console.log('Fetching data for facultyId:', facultyId);
 
-  // Open popup with row details
+    if (facultyId) {
+      fetch(`http://localhost:4000/recentfrs/${facultyId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Recent FRS Data:', data);
+          setData(data);
+        })
+        .catch(error => {
+          console.error('Error fetching recent FRS data:', error);
+          setError(error.message);
+        });
+    }
+  }, [user.id]);
+
   const handleViewClick = (row) => {
     setSelectedRow(row);
   };
 
-  // Close popup
   const handleClosePopup = () => {
     setSelectedRow(null);
   };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="recent-frs">
@@ -84,5 +104,11 @@ function RecentFRS() {
     </div>
   );
 }
+
+RecentFRS.propTypes = {
+  user: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default RecentFRS;

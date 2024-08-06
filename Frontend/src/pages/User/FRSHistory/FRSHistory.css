@@ -257,7 +257,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
   animation: fadeIn 0.3s ease;
 }
 
@@ -294,7 +294,7 @@
 .close-button {
   position: absolute;
   right: 20px;
-  top: 15px;
+  top: 8px;
   background: none;
   border: none;
   font-size: 1em;

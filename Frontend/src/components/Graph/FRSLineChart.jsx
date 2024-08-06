@@ -1,18 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import PropTypes from 'prop-types';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { format } from 'date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -21,71 +11,36 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend,
-  Filler,
-  ChartDataLabels
+  Legend
 );
 
-const FRSLineChart = ({ data }) => {
-  const showDataLabels = window.innerWidth > 768;
+function FRSLineChart({ data }) {
+  // Determine the current semester
+  const currentMonth = new Date().getMonth() + 1; // +1 because getMonth() returns 0-11
+  const isEvenSemester = currentMonth <= 6;
+
+  // Filter data for the current semester
+  const filteredData = data.filter(item => {
+    const month = parseInt(item.month.split('-')[1], 10);
+    return isEvenSemester ? month <= 6 : month > 6;
+  });
 
   const chartData = {
-    labels: data.map(item => item.month),
-    datasets: [
-      {
-        label: 'FRS Score',
-        data: data.map(item => item.score),
-        borderColor: '#007BFF', // Primary blue color
-        backgroundColor: (context) => {
-          const chart = context.chart;
-          const { ctx, chartArea } = chart;
-          if (!chartArea) return null;
-          return getGradient(ctx, chartArea);
-        },
-        borderWidth: 3,
-        pointBackgroundColor: '#007BFF',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        tension: 0.3,
-        fill: true,
-        datalabels: {
-          display: showDataLabels,
-          color: '#007BFF',
-          align: 'end',
-          anchor: 'end',
-          offset: 8,
-          font: {
-            weight: 'bold',
-            size: 14,
-          },
-          formatter: (value) => value.toFixed(2),
-        },
-      },
-    ],
-  };
-
-  const getGradient = (ctx, chartArea) => {
-    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-    gradient.addColorStop(0, 'rgba(0, 123, 255, 0.3)'); // Light blue start
-    gradient.addColorStop(1, 'rgba(0, 123, 255, 0)'); // Transparent end
-    return gradient;
+    labels: filteredData.map(d => format(new Date(`${d.month}-01`), 'MMMM')), // Format month to full month name
+    datasets: [{
+      label: 'FRS Points',
+      data: filteredData.map(d => d.score),
+      borderColor: 'rgba(75,192,192,1)',
+      backgroundColor: 'rgba(75,192,192,0.2)',
+      borderWidth: 1
+    }]
   };
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        display: true,
         position: 'top',
-        labels: {
-          font: {
-            size: 16,
-            weight: 'bold',
-          },
-          color: '#333',
-        },
       },
       title: {
         display: true,
@@ -97,74 +52,41 @@ const FRSLineChart = ({ data }) => {
         color: '#333',
       },
       tooltip: {
-        enabled: true,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-        cornerRadius: 6,
-        padding: 12,
-        xAlign: 'center',
-        yAlign: 'bottom',
         callbacks: {
-          label: function (tooltipItem) {
-            return `Score: ${tooltipItem.raw.toFixed(2)}`;
-          },
-        },
-      },
+          label: function(tooltipItem) {
+            return `Score: ${tooltipItem.raw}`;
+          }
+        }
+      }
     },
     scales: {
       x: {
-        grid: {
-          display: false, // Hide X-axis grid lines
-        },
-        ticks: {
-          font: {
-            size: 14,
-            color: '#666',
-          },
-        },
+        title: {
+          display: true,
+          text: 'Month'
+        }
       },
       y: {
-        grid: {
-          color: '#ddd', // Light gray grid color
-          lineWidth: 1,
-        },
-        beginAtZero: true,
-        ticks: {
-          font: {
-            size: 14,
-            color: '#666',
-          },
-        },
-      },
-    },
-    elements: {
-      line: {
-        borderCapStyle: 'round',
-        borderJoinStyle: 'round',
-        borderWidth: 4, // Slightly thicker line
-      },
-      point: {
-        hoverBackgroundColor: '#28A745', // Green on hover
-        hoverBorderColor: '#fff',
-      },
-    },
-    animation: {
-      duration: 1500,
-      easing: 'easeInOutCubic',
-    },
+        title: {
+          display: true,
+          text: 'Score'
+        }
+      }
+    }
   };
 
-  return <Line data={chartData} options={options} />;
-};
+  return (
+    <Line data={chartData} options={options} />
+  );
+}
 
 FRSLineChart.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       month: PropTypes.string.isRequired,
-      score: PropTypes.number.isRequired,
+      score: PropTypes.number.isRequired
     })
-  ).isRequired,
+  ).isRequired
 };
 
 export default FRSLineChart;

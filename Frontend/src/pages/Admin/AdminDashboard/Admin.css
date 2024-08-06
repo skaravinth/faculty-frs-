@@ -58,7 +58,7 @@
 }
 
 .leaderboard-frs {
-  display: flex;
+  display: none;
   width: 100%;
   height: 400px;
 }
@@ -75,11 +75,11 @@
   .grid-row {
     display: grid;
   }
-  .leaderboard-frs {
+  /* .leaderboard-frs {
     display: grid;
     height: auto;
     gap: 30px;
-  }
+  } */
   .admin {
     display: grid;
   }

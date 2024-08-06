@@ -1,84 +1,47 @@
-import React, { useState, useRef, useEffect } from 'react';
+import  { useState, useRef, useEffect } from 'react';
 import './FRSChart.css';
 import FRSLineChart from '../../../components/Graph/FRSLineChart';
 import SortIcon from '@mui/icons-material/Sort';
+import PropTypes from 'prop-types';
 
-const frsData = [
-  { month: 'March', score: 10 },
-  { month: 'April', score: 70 },
-  { month: 'May', score: 30 },
-  { month: 'June', score: 55 },
-  { month: 'July', score: 20 },
-  { month: 'August', score: 60 },
-];
-
-function FRSChart() {
+function FRSChart({ user }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedVertical, setSelectedVertical] = useState('All');
+  const [frsData, setFrsData] = useState([]);
   const dropdownRef = useRef(null);
 
-  const getDummyDataForCategory = (category) => {
-    switch (category) {
-      case 'All':
-        return frsData;
-      case 'Academics':
-        return [
-          { month: 'March', score: 20 },
-          { month: 'April', score: 50 },
-          { month: 'May', score: 60 },
-          { month: 'June', score: 40 },
-          { month: 'July', score: 80 },
-          { month: 'August', score: 90 },
-        ];
-      case 'Skill':
-        return [
-          { month: 'March', score: 30 },
-          { month: 'April', score: 10 },
-          { month: 'May', score: 40 },
-          { month: 'June', score: 60 },
-          { month: 'July', score: 10 },
-          { month: 'August', score: 40 },
-        ];
-      case 'IQAC':
-        return [
-          { month: 'March', score: 10 },
-          { month: 'April', score: 40 },
-          { month: 'May', score: 20 },
-          { month: 'June', score: 80 },
-          { month: 'July', score: 50 },
-          { month: 'August', score: 100 },
-        ];
-      case 'COE':
-        return [
-          { month: 'March', score: 20 },
-          { month: 'April', score: 60 },
-          { month: 'May', score: 40 },
-          { month: 'June', score: 50 },
-          { month: 'July', score: 10 },
-          { month: 'August', score: 10 },
-        ];
-      case 'Special Lab':
-        return [
-          { month: 'March', score: 70 },
-          { month: 'April', score: 10 },
-          { month: 'May', score: 40 },
-          { month: 'June', score: 30 },
-          { month: 'July', score: 50 },
-          { month: 'August', score: 10 },
-        ];
-      default:
-        return [];
-    }
-  };
+  useEffect(() => {
+    const fetchFRSData = async (facultyId, vertical) => {
+      try {
+        const response = await fetch(`http://localhost:4000/facultyfrsgraph/${facultyId}/${vertical}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Raw data fetched:', data);
 
-  const filteredData = getDummyDataForCategory(selectedVertical);
+        // Ensure data is an array and map it to the required format
+        const formattedData = Array.isArray(data) ? data.map(item => ({
+          month: item.month,
+          score: parseFloat(item.totalFRS) // Convert to number
+        })) : [];
+        
+        setFrsData(formattedData);
+      } catch (error) {
+        console.error('Error fetching FRS data:', error);
+      }
+    };
+
+    if (user && user.id) {
+      fetchFRSData(user.id, selectedVertical);
+    }
+  }, [user.id, selectedVertical]);
 
   const handleFilterChange = (filter) => {
     setSelectedVertical(filter);
     setShowDropdown(false);
   };
 
-  // Close dropdown when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -111,10 +74,16 @@ function FRSChart() {
       </div>
       <div className='selected-vertical'>{selectedVertical}</div>
       <div className="chart-container">
-        <FRSLineChart data={filteredData} />
+        <FRSLineChart data={frsData} />
       </div>
     </div>
   );
 }
+
+FRSChart.propTypes = {
+  user: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  }).isRequired,
+};
 
 export default FRSChart;

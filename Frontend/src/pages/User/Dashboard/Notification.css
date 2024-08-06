@@ -14,7 +14,12 @@
     transition: all 0.3s ease-in-out;
 }
 
-.task-details {
+.notification {
+    color: rgb(251, 131, 131);
+    font-size: 14px;
+    font-weight: bold;
+}
+/* .task-details {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,4 +100,4 @@ h2 {
         font-size: 0.7em;
     }
 }
-
+ */
