@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {jwtDecode} from 'jwt-decode';
 import './FRSSummary.css';
 import frsTotalImage from '../../../assets/images/frs_total.png';
 import frsGainedImage from '../../../assets/images/frs_gained.png';
@@ -15,15 +16,28 @@ function FRSSummary({ user }) {
 
   useEffect(() => {
     if (user && user.id) {
-      fetch(`http://localhost:4000/frssummary/${user.id}`)
+      const token = localStorage.getItem('jwt');
+
+      if (!token || !checkTokenValidity(token)) {
+        setError('Token has expired or is invalid');
+        return;
+      }
+
+      fetch(`http://localhost:4000/frssummary/${user.id}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies
+      })
         .then(response => {
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
           return response.json();
         })
         .then(data => {
-          console.log('Summary Data:', data); // Log the response data for debugging
           setSummary({
             total: parseInt(data.total, 10) || 0,
             gained: parseInt(data.gained, 10) || 0,
@@ -35,7 +49,7 @@ function FRSSummary({ user }) {
           setError(error.message);
         });
     }
-  }, [user.id]);
+  }, [user]);
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -44,21 +58,21 @@ function FRSSummary({ user }) {
   return (
     <div className="frs-summary">
       <div className="summary1">
-        <img className="summary-image" src={frsTotalImage} alt="FRS Total Image" />
+        <img className="summary-image" src={frsTotalImage} alt="FRS Total" />
         <div className="summary-text">
           <span className="summary-title">FRS Total</span>
           <span className="summary-value" style={{ color: '#29B6F6', fontWeight: 'bold' }}>{summary.total}</span>
         </div>
       </div>
       <div className="summary2">
-        <img className="summary-image" src={frsGainedImage} alt="FRS Gained Image" />
+        <img className="summary-image" src={frsGainedImage} alt="FRS Gained" />
         <div className="summary-text">
           <span className="summary-title">FRS Gained</span>
           <span className="summary-value" style={{ color: '#00C853', fontWeight: 'bold' }}>{summary.gained}</span>
         </div>
       </div>
       <div className="summary3">
-        <img className="summary-image" src={frsLostImage} alt="FRS Lost Image" />
+        <img className="summary-image" src={frsLostImage} alt="FRS Lost" />
         <div className="summary-text">
           <span className="summary-title">FRS Lost</span>
           <span className="summary-value" style={{ color: '#FF3D00', fontWeight: 'bold' }}>{summary.lost}</span>
@@ -66,6 +80,17 @@ function FRSSummary({ user }) {
       </div>
     </div>
   );
+}
+
+function checkTokenValidity(token) {
+  try {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000; // Current time in seconds
+    return decodedToken.exp >= currentTime;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return false;
+  }
 }
 
 FRSSummary.propTypes = {

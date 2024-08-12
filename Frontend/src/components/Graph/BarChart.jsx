@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart } from '@mui/x-charts';
 
 // Custom hook for window size
@@ -35,14 +35,25 @@ export default function SimpleBarChart() {
 
   useEffect(() => {
     const fetchFRSData = async () => {
+      const token = localStorage.getItem('jwt');
       try {
-        const response = await fetch('http://localhost:4000/admin/frs/monthly');
+        const response = await fetch('http://localhost:4000/admin/frs/monthly', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
 
         console.log('Fetched data:', data);
+
+        if (!Array.isArray(data)) {
+          throw new Error('Expected an array but got a different type');
+        }
 
         // Determine current semester
         const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
@@ -87,6 +98,12 @@ export default function SimpleBarChart() {
             secondLost.push(Math.abs(parseFloat(item.total_lost)) || 0);
           }
         });
+
+        console.log('First Semester Gained:', firstGained);
+        console.log('First Semester Lost:', firstLost);
+        console.log('Second Semester Gained:', secondGained);
+        console.log('Second Semester Lost:', secondLost);
+        console.log('Months:', semesterMonths);
 
         setFirstSemesterGained(firstGained);
         setFirstSemesterLost(firstLost);

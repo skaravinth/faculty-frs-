@@ -64,9 +64,16 @@ const FRSHistory = ({ user }) => {
   // Fetch data from backend
   useEffect(() => {
     const facultyId = user.id;
+    const token = localStorage.getItem('jwt');
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/frshistory/${facultyId}`);
+        const response = await fetch(`http://localhost:4000/frshistory/${facultyId}`,{
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         const data = await response.json();
         setRows(data);
       } catch (error) {

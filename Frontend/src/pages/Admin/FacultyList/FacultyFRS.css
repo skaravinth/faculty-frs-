@@ -37,7 +37,7 @@
   background-color: none;
   border-radius: 5px;
   overflow: hidden;
-  width: 100%;
+  width: 90%;
   height: 620px;
   display: flex;
   flex-direction: column;
@@ -105,6 +105,60 @@
   font-weight: bold;
   color: #1a237e;
   font-size: 16px;
+}
+
+.frs-heading {
+  font-size: 20px; /* Smaller heading size */
+  font-weight: bold;
+  margin-bottom: 12px; /* Reduced margin */
+  display: flex;
+  align-items: center;
+}
+
+.history-icon {
+  margin-right: 8px;
+}
+
+.actions-container {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Reduced gap */
+  margin-bottom: 12px; /* Reduced margin */
+}
+
+.search-bar2 {
+  width: 200px; /* Smaller width */
+}
+
+.back-button3 {
+  background-color: #1e88e5;
+  color: #fff;
+  border: none;
+  padding: 6px 12px; /* Smaller padding */
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px; /* Smaller font size */
+}
+
+.back-button3:hover {
+  background-color: #1565c0;
+}
+
+.data-grid-container {
+  width: 100%; /* Adjust width as needed */
+  max-width: 1200px; /* Optional max-width to limit the size */
+  margin: auto;
+}
+
+.frs-positive {
+  color: #2e7d32;
+}
+
+.frs-negative {
+  color: #c62828;
 }
 
 @media (max-width: 1400px) {

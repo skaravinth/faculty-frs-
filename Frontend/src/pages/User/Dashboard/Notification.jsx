@@ -44,7 +44,7 @@
 // }
 
 // export default Notification;
-
+ import React from "react";
 import './Notification.css';
 
 

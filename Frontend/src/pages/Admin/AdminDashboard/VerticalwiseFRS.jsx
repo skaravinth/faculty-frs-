@@ -1,4 +1,5 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode'; // Import the jwt-decode package
 import './VerticalwiseFRS.css';
 import academicsImage from '../../../assets/images/academics.png';
 import coeImage from '../../../assets/images/coe.png';
@@ -20,10 +21,25 @@ function VerticalwiseFRS() {
   const navigate = useNavigate();
   const [verticals, setVerticals] = useState(defaultVerticals);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from backend
-    fetch('http://localhost:4000/verticals/frs')
+    const token = localStorage.getItem('jwt');
+
+    if (!token || !checkTokenValidity(token)) {
+      setError('Token has expired or is invalid');
+      setLoading(false);
+      return;
+    }
+
+    // Fetch data from the backend
+    fetch('http://localhost:4000/verticals/frs', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -34,23 +50,34 @@ function VerticalwiseFRS() {
         // Ensure verticals array is not empty
         if (!Array.isArray(data)) {
           setError('Invalid data format');
+          setLoading(false);
           return;
         }
+
+        // Merge fetched data with default verticals
         const mergedData = defaultVerticals.map(defaultVertical => {
           const found = data.find(item => item.vertical === defaultVertical.vertical);
           return found ? { ...defaultVertical, ...found } : defaultVertical;
         });
+
         setVerticals(mergedData);
+        setLoading(false);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
         setError(error.message);
+        setLoading(false);
       });
   }, []);
 
   const handleVerticalClick = (name) => {
-    navigate('/head-dashboard', { state: { verticalName: name } });
+    console.log(name)
+    navigate(`/head-dashboard/${name}`);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -80,6 +107,24 @@ function VerticalwiseFRS() {
       )}
     </div>
   );
+}
+
+function checkTokenValidity(token) {
+  try {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+      console.log('Token has expired');
+      return false;
+    }
+
+    console.log('Token is valid');
+    return true;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return false;
+  }
 }
 
 export default VerticalwiseFRS;

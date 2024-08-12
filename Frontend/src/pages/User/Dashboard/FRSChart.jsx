@@ -1,4 +1,4 @@
-import  { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './FRSChart.css';
 import FRSLineChart from '../../../components/Graph/FRSLineChart';
 import SortIcon from '@mui/icons-material/Sort';
@@ -13,7 +13,13 @@ function FRSChart({ user }) {
   useEffect(() => {
     const fetchFRSData = async (facultyId, vertical) => {
       try {
-        const response = await fetch(`http://localhost:4000/facultyfrsgraph/${facultyId}/${vertical}`);
+        const token = localStorage.getItem('jwt');
+        const response = await fetch(`http://localhost:4000/facultyfrsgraph/${facultyId}/${vertical}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

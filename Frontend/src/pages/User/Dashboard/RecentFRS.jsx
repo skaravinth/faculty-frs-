@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './RecentFRS.css';
 import PropTypes from 'prop-types';
 
@@ -11,22 +11,29 @@ function RecentFRS({ user }) {
     const facultyId = user.id;
     console.log('Fetching data for facultyId:', facultyId);
 
-    if (facultyId) {
-      fetch(`http://localhost:4000/recentfrs/${facultyId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    const fetchRecentFRSData = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+        const response = await fetch(`http://localhost:4000/recentfrs/${facultyId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Recent FRS Data:', data);
-          setData(data);
-        })
-        .catch(error => {
-          console.error('Error fetching recent FRS data:', error);
-          setError(error.message);
         });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Recent FRS Data:', data);
+        setData(data);
+      } catch (error) {
+        console.error('Error fetching recent FRS data:', error);
+        setError(error.message);
+      }
+    };
+
+    if (facultyId) {
+      fetchRecentFRSData();
     }
   }, [user.id]);
 

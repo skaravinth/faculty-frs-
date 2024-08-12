@@ -1,11 +1,14 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
+const { sendEmail } = require('./emailService.jsx');
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
+
+const SECRET_KEY = '3f102fd66ccbca0aadeed03cd0d31278c85503b5a4a708818a6db3420d8ba5973';
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -14,78 +17,100 @@ const db = mysql.createPool({
     database: 'faculty_project'
 });
 
-db.getConnection((err) => {
-    if (err) {
-        console.error('Database connection error:', err);
-    } else {
-        console.log('Connected to the MySQL server.');
-    }
-});
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+};
 
-app.post('/login', (req, res) => {
+app.use(cors(corsOptions));
+
+function authenticateToken(req, res, next) {
+    const token = req.headers['authorization']?.split(' ')[1]; 
+
+    if (!token) return res.sendStatus(401); 
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) return res.sendStatus(403); 
+        req.user = user;
+        next();
+    });
+}
+
+app.post('/login', async (req, res) => {
     const { email } = req.body;
 
-    const sql = `
-        SELECT id, role, vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab
-        FROM faculty_frs
-        WHERE email = ?
-    `;
-    db.query(sql, [email], (err, result) => {
-        if (err) {
-            console.error('Database query error:', err);
-            return res.status(500).send('Server error');
-        }
+    try {
+        const [result] = await db.query(`
+            SELECT id, role, vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab, department
+            FROM faculty_frs
+            WHERE email = ?
+        `, [email]);
 
         if (result.length > 0) {
-            const { id, role, ...verticals } = result[0];
-            return res.json({ id, role, verticals });
+            const { id, role, department, ...verticals } = result[0];
+            const token = jwt.sign({ id, role }, SECRET_KEY, { expiresIn: '1h' });
+            return res.json({ token, user: { id, role, department, verticals } });
         } else {
             return res.status(404).send('User not found');
         }
+    } catch (err) {
+        console.error('Database query error:', err);
+        return res.status(500).send('Server error');
+    }
+});
+
+app.post('/api/verify-token', (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ isValid: false, message: 'Token is required' });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({ isValid: false, message: 'Invalid token' });
+        }
+
+        res.json({ isValid: true, user });
     });
 });
 
-app.post('/verticalhead', (req, res) => {
+app.get('/secure-endpoint', authenticateToken, (req, res) => {
+    res.json({ message: 'Secure data', user: req.user });
+});
+
+app.post('/verticalhead', authenticateToken, async (req, res) => {
     const { id, email, frs_update, reason, reason_info, verticalHeadId, vertical } = req.body;
 
-    const getDepartmentQuery = 'SELECT department FROM faculty_frs WHERE id = ?';
-    db.execute(getDepartmentQuery, [id], (err, results) => {
-        if (err) {
-            console.error('Error fetching department:', err);
-            res.status(500).json({ error: 'Failed to fetch department' });
-            return;
-        }
+    try {
+        const [results] = await db.query('SELECT department FROM faculty_frs WHERE id = ?', [id]);
 
         if (results.length === 0) {
-            res.status(404).json({ error: 'Faculty not found' });
-            return;
+            return res.status(404).json({ error: 'Faculty not found' });
         }
 
         const department = results[0].department;
 
-        const insertQuery = `
+        const [insertResults] = await db.query(`
             INSERT INTO frs_history (faculty_id, email, verticalhead_id, vertical, frs_updated, reason, reason_info, department)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+        `, [id, email, verticalHeadId, vertical, frs_update, reason, reason_info, department]);
 
-        db.execute(insertQuery, [id, email, verticalHeadId, vertical, frs_update, reason, reason_info, department], (err, results) => {
-            if (err) {
-                console.error('Error inserting data into the database:', err);
-                res.status(500).json({ error: 'Failed to submit form data' });
-                return;
-            }
-
-            res.status(200).json({ message: 'Form submitted successfully', data: results });
-        });
-    });
+        res.status(200).json({ message: 'Form submitted successfully', data: insertResults });
+    } catch (err) {
+        console.error('Error processing request:', err);
+        res.status(500).json({ error: 'Failed to submit form data' });
+    }
 });
 
-app.get('/verticalvisefrs/:id', (req, res) => {
+app.get('/verticalvisefrs/:id', authenticateToken, async (req, res) => {
     const userId = req.params.id;
     const query = `
         SELECT 
             vertical, 
-            COALESCE(SUM(CAST(frs_updated AS DECIMAL(8))), 0) AS total_frs_points
+            COALESCE(SUM(CAST(frs_updated AS DECIMAL(10,2))), 0) AS total_frs_points
         FROM 
             frs_history
         WHERE 
@@ -94,23 +119,16 @@ app.get('/verticalvisefrs/:id', (req, res) => {
             vertical;
     `;
   
-    db.query(query, [userId], (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Internal Server Error');
-            return;
-        }
-
-        if (results.length === 0) {
-            res.status(404).send('User not found');
-            return;
-        }
-
+    try {
+        const [results] = await db.query(query, [userId]);
         res.json(results);
-    });
+    } catch (error) {
+        console.error('Error executing query:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
-app.get('/frssummary/:id', (req, res) => {
+app.get('/frssummary/:id', authenticateToken, async (req, res) => {
     const userId = req.params.id;
 
     const query = `
@@ -124,23 +142,21 @@ app.get('/frssummary/:id', (req, res) => {
             faculty_id = ?
     `;
 
-    db.execute(query, [userId], (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Internal Server Error');
-            return;
-        }
+    try {
+        const [results] = await db.query(query, [userId]);
 
         if (results.length === 0) {
-            res.status(404).send('User not found');
-            return;
+            return res.status(404).send('User not found');
         }
 
         res.json(results[0]);
-    });
+    } catch (error) {
+        console.error('Error executing query:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-app.get('/recentfrs/:faculty_id', (req, res) => {
+app.get('/recentfrs/:faculty_id', authenticateToken, async (req, res) => {
     const facultyId = req.params.faculty_id;
     const query = `
         SELECT 
@@ -155,18 +171,16 @@ app.get('/recentfrs/:faculty_id', (req, res) => {
         LIMIT 5;
     `;
 
-    db.query(query, [facultyId], (err, results) => {
-        if (err) {
-            console.error('Error fetching recent FRS data:', err);
-            res.status(500).json({ error: 'Failed to fetch recent FRS data' });
-            return;
-        }
-
+    try {
+        const [results] = await db.query(query, [facultyId]);
         res.status(200).json(results);
-    });
+    } catch (err) {
+        console.error('Error fetching recent FRS data:', err);
+        res.status(500).json({ error: 'Failed to fetch recent FRS data' });
+    }
 });
 
-app.get('/facultyfrsgraph/:faculty_id/:vertical', (req, res) => {
+app.get('/facultyfrsgraph/:faculty_id/:vertical', authenticateToken, async (req, res) => {
     const { faculty_id, vertical } = req.params;
 
     if (!faculty_id) {
@@ -188,16 +202,16 @@ app.get('/facultyfrsgraph/:faculty_id/:vertical', (req, res) => {
             month;
     `;
 
-    db.query(query, [faculty_id, vertical, vertical], (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
+    try {
+        const [results] = await db.query(query, [faculty_id, vertical, vertical]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'Database query failed' });
+    }
 });
 
-app.get('/frshistory/:faculty_id', (req, res) => {
+app.get('/frshistory/:faculty_id', authenticateToken, async (req, res) => {
     const facultyId = req.params.faculty_id;
     const query = `
         SELECT 
@@ -211,19 +225,16 @@ app.get('/frshistory/:faculty_id', (req, res) => {
         ORDER BY created_at DESC;
     `;
 
-    db.query(query, [facultyId], (err, results) => {
-        if (err) {
-            console.error('Error fetching data:', err);
-            res.status(500).json({ error: 'Error fetching data' });
-            return;
-        }
+    try {
+        const [results] = await db.query(query, [facultyId]);
         res.status(200).json(results);
-    });
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
 });
 
-const promisePool = db.promise();
-// Route to get verticals
-app.get('/verticals/frs', (req, res) => {
+app.get('/verticals/frs', authenticateToken, async (req, res) => {
     const query = `
         SELECT 
             vertical,
@@ -232,21 +243,19 @@ app.get('/verticals/frs', (req, res) => {
         FROM frs_history
         GROUP BY vertical;
     `;
-  
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            res.status(500).send('Internal server error');
-            return;
-        }
+
+    try {
+        const [results] = await db.query(query);
         res.json(results);
-    });
+    } catch (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Internal server error');
+    }
 });
 
-
-app.get('/admin/frs/monthly', async (req, res) => {
+app.get('/admin/frs/monthly',authenticateToken, async (req, res) => {
     try {
-      const [rows] = await promisePool.query(`
+      const [rows] = await db.query(`
         SELECT 
             DATE_FORMAT(created_at, '%Y-%m') AS month,
             SUM(CASE WHEN frs_updated > 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_gained,
@@ -262,87 +271,410 @@ app.get('/admin/frs/monthly', async (req, res) => {
     }
   });
 
+app.get('/admin/frs/verticals', authenticateToken, async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                vertical, 
+                SUM(CASE WHEN frs_updated > 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_provided
+            FROM frs_history
+            GROUP BY vertical;
+        `;
+        const [rows] = await db.query(query); // Directly handle the promise
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
-async function getMonthlyFRSData() {
-    const query = `
-      SELECT 
-          DATE_FORMAT(created_at, '%m') AS month,
-          SUM(CASE WHEN frs_updated > 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_gained,
-          SUM(CASE WHEN frs_updated < 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_lost
-      FROM frs_history
-      GROUP BY month
-      ORDER BY month;
+app.get('/api/faculty', authenticateToken, async (req, res) => {
+    const { academicYear, semester } = req.query;
+  
+    // Function to generate the past three academic years
+    const generatePastAcademicYears = () => {
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let i = 0; i < 3; i++) {
+        const startYear = currentYear - i;
+        const endYear = startYear + 1;
+        years.push(`${startYear}-${endYear}`);
+      }
+      return years;
+    };
+  
+    const pastAcademicYears = generatePastAcademicYears();
+  
+    // Handle academicYear filter to include past three academic years
+    const academicYearFilter = academicYear && pastAcademicYears.includes(academicYear) ? [academicYear] : pastAcademicYears;
+  
+    // Build the base query
+    let query = `
+      SELECT
+        @row_number := @row_number + 1 AS sNo,
+        ff.id AS facultyId,
+        ff.name AS facultyName,
+        ff.department,
+        ff.designation,
+        SUM(fh.frs_updated) AS frsScore,
+        fh.academic_year AS academicYear,
+        ${semester ? 'fh.semester AS semester' : 'NULL AS semester'}
+      FROM faculty_frs ff
+      JOIN frs_history fh ON ff.id = fh.faculty_id
+      JOIN (SELECT @row_number := 0) AS rn
+      WHERE ff.role = 'user'
+      AND fh.academic_year IN (${academicYearFilter.map(() => '?').join(',')})
+    `;
+  
+    // Add filtering conditions for semester if provided
+    if (semester) {
+      query += `
+        AND fh.semester = ?
+      `;
+    }
+  
+    // Group the results
+    if (semester) {
+      query += `
+        GROUP BY ff.id, fh.academic_year, fh.semester
+      `;
+    } else {
+      query += `
+        GROUP BY ff.id, fh.academic_year
+      `;
+    }
+  
+    // Order by the total FRS score
+    query += `
+      ORDER BY frsScore DESC
     `;
   
     try {
-      const [rows] = await pool.query(query);
-  
-      // Split data into two semesters
-      const firstSemester = rows.filter(item => parseInt(item.month, 10) <= 6);
-      const secondSemester = rows.filter(item => parseInt(item.month, 10) > 6);
-  
-      return {
-        firstSemester,
-        secondSemester
-      };
-    } catch (error) {
-      throw new Error('Error fetching data');
-    }
-  }
-  
-
-  app.get('/admin/frs/monthly', async (req, res) => {
-    try {
-      const data = await getMonthlyFRSData();
-      res.json(data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  
-  app.get('/api/faculty', (req, res) => {
-    const query = `SELECT
-    @row_number := @row_number + 1 AS sNo,id AS facultyId,name AS facultyName,department,designation,frs AS frsScore FROM
-    faculty_frs
-  JOIN (SELECT @row_number := 0) AS rn
-  WHERE
-    role = 'user';
-  `
-    ;
-  
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching faculty data:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
+      // Construct the parameters array
+      let params = [...academicYearFilter];
+      if (semester) {
+        params.push(semester);
       }
   
+      console.log('Generated Query:', query);
+      console.log('Parameters:', params);
+  
+      // Ensure this line is inside an async function
+      const [results] = await db.query(query, params);
       res.json(results);
-    });
-  });
-
-
-app.get('/admin/frs/verticals', async (req, res) => {
-    try {
-      const query = `
-        SELECT 
-          vertical, 
-          SUM(CASE WHEN frs_updated > 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_provided
-        FROM frs_history
-        GROUP BY vertical;
-      `;
-      const [rows] = await promisePool.query(query); // Directly handle the promise
-      res.json(rows);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      res.status(500).send('Internal Server Error');
+    } catch (err) {
+      console.error('Error fetching faculty data:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
   
 
 
+  
+app.get('/api/verticalhead/frs-summary/:id', authenticateToken, async (req, res) => {
+    const verticalHeadId = req.params.id;
 
-app.listen(4000, () => {
-    console.log('Server is running on port 4000');
+    try {
+        // Fetch the vertical head's verticals
+        const [verticalHeadRows] = await db.query(`
+            SELECT vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab 
+            FROM faculty_frs 
+            WHERE id = ? AND role = 'vertical_head'
+        `, [verticalHeadId]);
+
+        if (verticalHeadRows.length === 0) {
+            return res.status(404).json({ message: 'Vertical head not found' });
+        }
+
+        const verticals = verticalHeadRows[0];
+        const vertical = Object.keys(verticals).find(key => verticals[key] === 1);
+
+        if (!vertical) {
+            return res.status(404).json({ message: 'No vertical assigned to this vertical head' });
+        }
+
+        // Map the column name to the actual vertical name in uppercase
+        const verticalMap = {
+            vertical_coe: 'COE',
+            vertical_academics: 'Academics',
+            vertical_iqac: 'IQAC',
+            vertical_skillteam: 'Skill Team',
+            vertical_speciallab: 'Special Lab'
+        };
+
+        const verticalName = verticalMap[vertical];
+
+        // Fetch the FRS summary
+        const [summaryRows] = await db.query(`
+            SELECT 
+                COALESCE(SUM(CASE WHEN frs_updated > 0 THEN frs_updated ELSE 0 END), 0) AS frsProvided,
+                COALESCE(SUM(CASE WHEN frs_updated < 0 THEN frs_updated ELSE 0 END), 0) AS frsTaken
+            FROM frs_history
+            WHERE vertical = ?
+        `, [verticalName]);
+
+        const { frsProvided, frsTaken } = summaryRows[0];
+
+        res.json({ vertical: verticalName, frsProvided, frsTaken });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+app.get('/api/verticalhead/record-summary/:id', authenticateToken, async (req, res) => {
+    const verticalHeadId = req.params.id;
+
+    try {
+        // Fetch the vertical(s) for the vertical head
+        const [verticalRows] = await db.query(`
+            SELECT vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab 
+            FROM faculty_frs 
+            WHERE id = ? AND role = 'vertical_head'
+        `, [verticalHeadId]);
+
+        if (verticalRows.length === 0) {
+            return res.status(404).json({ message: 'Vertical head not found' });
+        }
+
+        const verticals = verticalRows[0];
+        const assignedVerticals = Object.keys(verticals).filter(key => verticals[key] === 1);
+
+        if (assignedVerticals.length === 0) {
+            return res.status(404).json({ message: 'No verticals assigned to this vertical head' });
+        }
+
+        // Convert vertical names to be used in the query
+        const verticalNames = {
+            vertical_coe: 'COE',
+            vertical_academics: 'Academics',
+            vertical_iqac: 'IQAC',
+            vertical_skillteam: 'Skill Team',
+            vertical_speciallab: 'Special Lab'
+        };
+
+        const verticalNameList = assignedVerticals.map(v => verticalNames[v]);
+
+        // Query the FRS history based on the vertical(s)
+        const [updateRows] = await db.query(`
+            SELECT 
+                COUNT(*) AS totalUpdates,
+                SUM(CASE WHEN frs_updated > 0 THEN 1 ELSE 0 END) AS positiveUpdates,
+                SUM(CASE WHEN frs_updated < 0 THEN 1 ELSE 0 END) AS negativeUpdates
+            FROM frs_history
+            WHERE vertical IN (?)
+        `, [verticalNameList]);
+
+        const { totalUpdates, positiveUpdates, negativeUpdates } = updateRows[0];
+
+        res.json({ totalUpdates, positiveUpdates, negativeUpdates });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+app.get('/api/verticalhead/:id/frs-summary', authenticateToken, async (req, res) => {
+    const verticalHeadId = req.params.id;
+
+    try {
+        // Query to get vertical details for the specified vertical head
+        const [verticalRows] = await db.query(`
+            SELECT vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab
+            FROM faculty_frs
+            WHERE id = ? AND role = 'vertical_head'
+        `, [verticalHeadId]);
+
+        if (verticalRows.length === 0) {
+            return res.status(404).json({ message: 'Vertical head not found or no vertical assigned' });
+        }
+
+        // Extract verticals from the result
+        const verticals = verticalRows[0];
+        const assignedVertical = Object.keys(verticals).find(key => verticals[key] === 1);
+
+        if (!assignedVertical) {
+            return res.status(404).json({ message: 'No vertical assigned to this vertical head' });
+        }
+
+        // Map column name to vertical name
+        const verticalMap = {
+            vertical_coe: 'COE',
+            vertical_academics: 'Academics',
+            vertical_iqac: 'IQAC',
+            vertical_skillteam: 'Skill Team',
+            vertical_speciallab: 'Special Lab'
+        };
+
+        const verticalName = verticalMap[assignedVertical];
+
+        // Query to get FRS data for each semester
+        const [rows] = await db.query(`
+            SELECT 
+                DATE_FORMAT(created_at, '%Y-%m') AS month,
+                SUM(CASE WHEN frs_updated > 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_gained,
+                SUM(CASE WHEN frs_updated < 0 THEN CAST(frs_updated AS DECIMAL) ELSE 0 END) AS total_lost
+            FROM frs_history where vertical = ? 
+            GROUP BY month
+            ORDER BY month;
+          `,[verticalName]);
+        
+
+        // Combine vertical name and FRS summary
+        res.json({ vertical: verticalName, frsSummary: rows });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.get('/api/verticalhead/:id/VerticalFrs', authenticateToken, async (req, res) => {
+    const verticalHeadId = req.params.id;
+  
+    try {
+      const [verticalRows] = await db.query(`
+        SELECT vertical_coe, vertical_academics, vertical_iqac, vertical_skillteam, vertical_speciallab
+        FROM faculty_frs
+        WHERE id = ? AND role = 'vertical_head'
+      `, [verticalHeadId]);
+  
+      if (verticalRows.length === 0) {
+        return res.status(404).json({ message: 'Vertical head not found or no vertical assigned' });
+      }
+  
+      const verticals = verticalRows[0];
+      const assignedVertical = Object.keys(verticals).find(key => verticals[key] === 1);
+  
+      if (!assignedVertical) {
+        return res.status(404).json({ message: 'No vertical assigned to this vertical head' });
+      }
+  
+      const verticalMap = {
+        vertical_coe: 'COE',
+        vertical_academics: 'Academics',
+        vertical_iqac: 'IQAC',
+        vertical_skillteam: 'Skill Team',
+        vertical_speciallab: 'Special Lab'
+      };
+  
+      const verticalName = verticalMap[assignedVertical];
+  
+      const [frshistory] = await db.query(`
+        SELECT 
+          fh.faculty_id AS facultyId,
+          fh.frs_updated AS frsScore,
+          fh.reason,
+          fh.semester,
+          fh.academic_year,
+          fh.created_at,
+          ff.name AS facultyName
+        FROM 
+          frs_history fh
+        INNER JOIN 
+          faculty_frs ff 
+        ON 
+          fh.faculty_id = ff.id
+        WHERE 
+          fh.vertical = ?
+      `, [verticalName]);
+  
+      res.json({ vertical: verticalName, frsSummary: frshistory });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+// Fetch all users from the faculty_frs table
+app.get('/api/faculty_frs', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT id, name, department FROM faculty_frs where role="user"');
+      res.json({ users: rows });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  // Update FRS values for multiple users
+  app.get('/api/department', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT DISTINCT department FROM faculty_frs');
+      const departments = rows.map(row => row.department); // Ensure to map rows to department names
+      res.json({ departments });
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  app.get('/api/faculty/list',async(req,res)=>{
+    try{
+        const [rows] = await db.query('SELECT id, name, department FROM faculty_frs WHERE role="user"');
+        res.json({ users: rows });
+    }
+    catch(error){
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  app.post('/api/frs/add', async (req, res) => {
+    const { facultyData } = req.body;
+  
+    if (!facultyData || !Array.isArray(facultyData) || facultyData.length === 0) {
+      return res.status(400).json({ message: 'No valid faculty data provided' });
+    }
+  
+    try {
+      for (const faculty of facultyData) {
+        const { facultyID, facultyName, frs, reasonTitle, reason, verticalheadsid, vertical } = faculty;
+  
+        // Fetch the faculty's email and department
+        const [result] = await db.query('SELECT email, department FROM faculty_frs WHERE id = ?', [facultyID]);
+  
+        if (result.length === 0) {
+          console.error(`Faculty not found for ID: ${facultyID}`);
+          continue;
+        }
+  
+        const { email, department } = result[0];
+  
+        // Determine academic year and semester
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+  
+        let academic_year;
+        let semester;
+  
+        if (month >= 7 && month <= 12) {
+          academic_year = `${year}-${year + 1}`;
+          semester = 'odd';
+        } else {
+          academic_year = `${year - 1}-${year}`;
+          semester = 'even';
+        }
+  
+        // Insert the FRS record into history
+        await db.query(`
+          INSERT INTO frs_history (faculty_id, email, frs_updated, reason_info, verticalhead_id, vertical, reason, created_at, department, academic_year, semester)
+          VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)
+        `, [facultyID, email, frs, reasonTitle, verticalheadsid, vertical, reason, department, academic_year, semester]);
+  
+        await sendEmail(
+          email,
+          'FRS Updated',
+          `Dear ${facultyName},\n\nYour FRS record has been updated.\n\nUpdated By: ${frs}\nReason: ${reason}\n\nThank you,\nThe Team` 
+        );
+  
+        console.log(`FRS record inserted and email sent for Faculty ID: ${facultyID}`);
+      }
+  
+      res.status(201).json({ message: 'FRS added successfully for all selected faculties' });
+    } catch (error) {
+      console.error('Error processing bulk submission:', error);
+      res.status(500).json({ message: 'Error processing bulk submission', error: error.message });
+    }
+  });
+    
+
+
+  
+const PORT = 4000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

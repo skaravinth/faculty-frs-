@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; 
+import {jwtDecode} from 'jwt-decode'; // Corrected import
 import { styled, useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
@@ -117,21 +118,35 @@ const adminMenuItems = [
   { text: 'Faculty FRS', icon: <FacultyListIcon />, link: '/faculty-entry' },
 ];
 
-export default function Navbar({ user }) {
+const hrMenuItems =[
+  {text: 'Faculty FRS',icon: <FacultyListIcon /> , link:'/'}
+]
+
+export default function Navbar({ jwtToken ,onLogout}) {
   const theme = useTheme();
   const [open, setOpen] = useState(true);
-  const [userRole, setUserRole] = useState(user.role || ''); // Initialize with user's role
+  const [userRole, setUserRole] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
+  const navigate = useNavigate(); 
 
   const isMobile = useMediaQuery('(max-width:500px)');
   const isTablet = useMediaQuery('(max-width:1200px)');
 
   useEffect(() => {
-    setUserRole(user.role); // Update userRole if user.role changes
-  }, [user]);
+    // Decode the JWT token to get the user role
+    if (jwtToken) {
+      try {
+        const decoded = jwtDecode(jwtToken);
+        setUserRole(decoded.role || ''); // Handle missing 'role' field
+      } catch (error) {
+        console.error('Error decoding JWT token:', error);
+        setUserRole('');
+      }
+    }
+  }, [jwtToken]);
 
   useEffect(() => {
     if (isMobile || isTablet) {
@@ -188,6 +203,10 @@ export default function Navbar({ user }) {
       },
     },
   });
+  const handleLogout = () => {
+    // Clear the token from localStorage
+  onLogout();
+  };
 
   const iconTooltips = {
     darkMode: darkMode ? 'Disable Dark Mode' : 'Enable Dark Mode',
@@ -223,14 +242,23 @@ export default function Navbar({ user }) {
           <ListItemIcon
             sx={{
               minWidth: 0,
-              mr: open ? 3 : 'auto',
+              mr: open ? 2 : 'auto',
               justifyContent: 'center',
-              color: 'inherit',
+              color: theme.palette.mode === 'dark' ? '#fff' : '#616161',
             }}
           >
             {item.icon}
           </ListItemIcon>
-          <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+          <ListItemText
+            primary={item.text}
+            sx={{
+              opacity: open ? 1 : 0,
+              color: theme.palette.mode === 'dark' ? '#fff' : '#616161',
+              '& .MuiTypography-root': {
+                fontWeight: 'bold',
+              },
+            }}
+          />
         </ListItemButton>
       </ListItem>
     ));
@@ -272,7 +300,7 @@ export default function Navbar({ user }) {
               </>
             )}
             <Box sx={{ flexGrow: 1 }} />
-            <Tooltip title={iconTooltips.darkMode}>
+            {/* <Tooltip title={iconTooltips.darkMode}>
               <IconButton color="inherit" onClick={handleToggleTheme}>
                 {darkMode ? <WbSunnyIcon /> : <Brightness4Icon />}
               </IconButton>
@@ -281,10 +309,10 @@ export default function Navbar({ user }) {
               <IconButton color="inherit" onClick={handleNotificationClick}>
                 <NotificationsIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title={iconTooltips.profile}>
               <IconButton edge="end" color="inherit" onClick={handleProfileClick}>
-                <AccountCircleIcon />
+                <AccountCircleIcon sx={{fontSize: '30px'}}/>
               </IconButton>
             </Tooltip>
             <Menu
@@ -300,7 +328,7 @@ export default function Navbar({ user }) {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+              {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
               <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
             </Menu>
             <Notification
@@ -321,8 +349,8 @@ export default function Navbar({ user }) {
               }}
             >
               <Box sx={{ p: 2 }}>
-                <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-                <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+                {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Box>
             </Popover>
           </Toolbar>
@@ -351,6 +379,7 @@ export default function Navbar({ user }) {
                 {userRole === 'user' && renderMenuItems(userMenuItems)}
                 {userRole === 'vertical_head' && renderMenuItems(verticalHeadMenuItems)}
                 {userRole === 'admin' && renderMenuItems(adminMenuItems)}
+                {userRole === 'hr' && renderMenuItems(hrMenuItems)}
               </List>
             </Box>
           </SwipeableDrawer>
@@ -380,6 +409,7 @@ export default function Navbar({ user }) {
               {userRole === 'user' && renderMenuItems(userMenuItems)}
               {userRole === 'vertical_head' && renderMenuItems(verticalHeadMenuItems)}
               {userRole === 'admin' && renderMenuItems(adminMenuItems)}
+              {userRole === 'hr' && renderMenuItems(hrMenuItems)}
             </List>
           </Drawer>
         )}
@@ -389,7 +419,6 @@ export default function Navbar({ user }) {
 }
 
 Navbar.propTypes = {
-  user: PropTypes.shape({
-    role: PropTypes.string.isRequired,
-  }).isRequired,
+  jwtToken: PropTypes.string.isRequired,
+  onLogout: PropTypes.func.isRequired,
 };
